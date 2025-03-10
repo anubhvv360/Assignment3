@@ -1,2 +1,4 @@
 streamlit
-openai
+pandas
+langchain
+google-generativeai
