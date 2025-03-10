@@ -15,9 +15,9 @@ def load_llm():
     Make sure you have your GOOGLE_API_KEY in st.secrets["GOOGLE_API_KEY"].
     """
     return ChatGoogleGenerativeAI(
-        model="gemini-1.5-flash-8b",  # or another available model (e.g. "chat-bison@001")
-        temperature=0.3,
-        max_tokens=4000,
+        model="gemini-1.5-pro-latest",  # or another available model (e.g. "chat-bison@001")
+        temperature=0.5,
+        max_tokens=8000,
         api_key=st.secrets["GOOGLE_API_KEY"]
     )
 
