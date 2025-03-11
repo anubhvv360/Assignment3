@@ -147,7 +147,7 @@ if 'contract_draft' not in st.session_state:
 # -------------------------------
 # 4. Streamlit App Layout
 # -------------------------------
-st.title("Procurement Automation (ChatGoogleGenerativeAI)")
+st.title("Procurement Agent")
 
 # Step 1: Inputs
 st.header("Step 1: Upload Inputs & Business Requirements")
