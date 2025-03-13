@@ -480,3 +480,41 @@ if st.session_state['technical_requirements']:
     st.download_button("Download Technical Requirements", st.session_state['technical_requirements'], file_name="Technical_Requirements.txt")
 if st.session_state['contract_draft']:
     st.download_button("Download Contract Draft", st.session_state['contract_draft'], file_name="Contract_Draft.txt")
+
+# Sidebar Configuration
+st.sidebar.title("ℹ️ About This App")
+st.sidebar.markdown(
+    """
+    This Agentic AI tool automates TransGlobal Industries' procurement process using advanced **GenAI technologies** (LLMs, LangChain, and Streamlit). 
+    It transforms business requirements into technical specifications, generates RFPs, streamlines vendor selection, evaluates bids, and simulates negotiation strategies—reducing manual work, improving accuracy, and accelerating decision-making. 🚀
+    """
+)
+
+# 📌 Display library versions
+st.sidebar.markdown("### 📦 Library Versions")
+st.sidebar.markdown(f"🔹 **Streamlit**: {st.__version__}")
+st.sidebar.markdown(f"🔹 **LangChain**: {langchain.__version__}")
+st.sidebar.markdown(f"🔹 **google-generativeai**: {genai.__version__}")
+st.sidebar.markdown(f"🔹 **Pandas**: {pd.__version__}")
+
+# Sidebar section
+st.sidebar.markdown("---")
+st.sidebar.markdown("**Created by Group 2**")
+
+# Create a DataFrame for the table
+groupdata = {
+    "Name": [
+        "Anubhav Verma", "Aniket Singh", "Ankit Mamgai",
+        "Rohit Behara", "Akshay Patel", "Sudhanshoo Badwe"
+    ],
+    "FT Number": [
+        "FT251021", "FT251018", "FT251019",
+        "FT251066", "FT252010", "FT251093"
+    ]
+}
+
+groupdf = pd.DataFrame(groupdata)
+
+# Display the table in the sidebar
+st.sidebar.markdown("### 👥 Team Members")
+st.sidebar.table(groupdf)
