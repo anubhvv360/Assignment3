@@ -503,12 +503,12 @@ st.sidebar.markdown("**Created by Group 2**")
 # Create a DataFrame for the table
 groupdata = {
     "Name": [
-        "Anubhav Verma", "Aniket Singh", "Ankit Mamgai",
-        "Rohit Behara", "Akshay Patel", "Sudhanshoo Badwe"
+        "Aniket Singh", "Ankit Mamgai", "Anubhav Verma",
+        "Rohit Behara", "Sudhanshoo Badwe", "Akshay Patel"
     ],
     "FT Number": [
-        "FT251021", "FT251018", "FT251019",
-        "FT251066", "FT252010", "FT251093"
+        "FT251018", "FT251019", "FT251021",
+        "FT251066", "FT251093", "FT252010"
     ]
 }
 
