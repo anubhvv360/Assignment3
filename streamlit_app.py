@@ -36,7 +36,7 @@ llm = load_llm()
 # -------------------------------
 # 2. LLM-Driven Functions
 # -------------------------------
-def convert_business_to_technical(business_text):
+def brd_to_trd(brd):
     """Use the LLM to convert business requirements into technical requirements."""
     prompt_template = """You are a Senior Technical Procurement Specialist at a manufacturing firm. Your task is to convert the following Business Requirements Document (BRD) into a comprehensive, strictly technical requirements document. Use only the details provided in the BRD and do not add any external information. The output must include both functional and non-functional requirements for purchasing new servers, software, or other technical assets, and it should be written so that suppliers can unambiguously understand every specification.
                         Your output must clearly address each of the following key factors and include specific examples or ranges where applicable:
@@ -73,22 +73,22 @@ def convert_business_to_technical(business_text):
                         Instruction:
                         Convert the provided BRD into a detailed Technical Requirements Document that strictly contains technical details extracted from the BRD. 
                         For each key technical aspect (e.g., processor, RAM, storage), if the BRD suggests intensive or high-performance needs, the output must specify exact or minimum values such as "16 GB DDR4" or "512GB SSD or more" as appropriate. Similarly, include specific requirements for connectivity, operating system, software, hidden cost considerations, regulatory compliance, and risk mitigation measures.
-                        BRD: {business_text}"""
+                        BRD: {brd}"""
     
-    prompt = PromptTemplate(input_variables=["business_text"], template=prompt_template)
+    prompt = PromptTemplate(input_variables=["brd"], template=prompt_template)
     chain = LLMChain(llm=llm, prompt=prompt)
-    return chain.run(business_text=business_text)
+    return chain.run(brd = brd)
 
-def generate_rfp(technical_requirements):
+def trd_to_rfp(trd):
     """Use the LLM to generate an RFP document from technical requirements."""
     prompt_template = """Convert the following Technical Requirements Document into a comprehensive and professional Request for Proposal (RFP) document.
                       The RFP should clearly articulate all technical details and performance criteria required from potential suppliers, based solely on the provided input.
-                      Technical Requirements: {technical_requirements}
+                      Technical Requirements: {trd}
                       NOTE: do not introduce any external details or hallucinations."""
     
-    prompt = PromptTemplate(input_variables=["technical_requirements"], template=prompt_template)
+    prompt = PromptTemplate(input_variables=["trd"], template=prompt_template)
     chain = LLMChain(llm=llm, prompt=prompt)
-    return chain.run(technical_requirements=technical_requirements)
+    return chain.run(trd = trd)
 
 def match_vendors(vendor_df):
     """
@@ -144,7 +144,7 @@ def match_vendors(vendor_df):
     #     shortlisted = vendor_df.head(3)
     return shortlisted
 
-def generate_tender_doc(tech_req):
+def generate_tender_doc(trd):
     prompt_template = """ Using the provided Technical Requirements Document (TRD) (variable: {trd}), generate a professional tender document for procurement purposes. The tender document should be structured, clear, and concise, ensuring that vendors fully understand the technical and business requirements.
                         The tender document should include the following sections:
                         
@@ -173,7 +173,7 @@ def generate_tender_doc(tech_req):
     
     prompt = PromptTemplate(input_variables=["trd"], template=prompt_template)
     chain = LLMChain(llm=llm, prompt=prompt)
-    return chain.run(trd = tech_req)
+    return chain.run(trd = trd)
 
 def generate_email(rfp):
     prompt_template = """ Generate a professional email addressed to the shortlisted vendors inviting them to submit their bids for the attached Tender Document and Request for Proposal (RFP). The email should be formal, clear, and concise, ensuring that vendors understand the expectations and submission requirements.
@@ -192,25 +192,33 @@ def generate_email(rfp):
     chain = LLMChain(llm=llm, prompt=prompt)
     return chain.run(rfp = rfp)
 
-def evaluate_bids(bids_df):
+def evaluate_bids(bids_df, trd):
     """
     Use the LLM to evaluate bids and pick the top 2 based on price, quality, timelines, etc.
     Again, we only pass a sample of the bids to keep the prompt short.
     """
-    # bids_data_str = bids_df.head(10).to_csv(index=False)
-    prompt_template = """You have the following bids:\n{bids_df}\n\n
-                      Evaluate each bid based on price, quality, delivery timelines, and technology.
-                      Select the top 2 bids and return them in CSV format with columns: BidID, EvaluationScore."""
+    bids_csv_text = bids_df.to_string(index=False)  # Converts the DataFrame to a text
 
-    prompt = PromptTemplate(input_variables=["bids_df"], template=prompt_template)
+    prompt_template = """Chain-of-thought prompt:
+
+                        1. Read the bids file {bids_csv_text} and the Technical Requirements Document {trd}.
+                        2. For each bid, extract the Unit Price and rank bids so that the bid with the lowest Unit Price gets the highest numerical rank (e.g., if there are 4 bids, the lowest price gets rank 4 and the highest gets rank 1). Record this as price_BidX for each bid.
+                        3. For each bid, compare its technical proposal attributes (processor, RAM, storage, display, graphics, battery life, ports, connectivity, operating system, and warranty) with the specifications in the TRD. Assign a technical capability score (tech_cap_BidX) from 0 to 1 based on the similarity.
+                        4. For each bid, extract the Lead Time from the delivery schedule and rank bids so that the bid with the lowest Lead Time gets the highest numerical rank and the bid with the highest Lead Time gets rank 1. Record this as delivery_BidX.
+                        5. Independently rank the overall quality of each bid (excluding technical specifications) so that the bid with the best quality gets the highest numerical rank and the worst quality gets rank 1. Record this as quality_BidX.
+                        6. Compute a weighted average score for each bid using the formula:  
+                          Weighted_Average_BidX = (price_BidX * 0.4) + (tech_cap_BidX * 0.3) + (quality_BidX * 0.2) + (delivery_BidX * 0.1).
+                        7. Rank all bids by their weighted average scores in descending order and select the top 2 bids.
+                        8. Output only a CSV file with a single column "VendorName" listing the vendor names of the top 2 bids.
+                        
+                        Return strictly the CSV output with no additional text."""
+
+    prompt = PromptTemplate(input_variables=["bids_csv_text", "trd"], template=prompt_template)
     chain = LLMChain(llm=llm, prompt=prompt)
-    output = chain.run(bids_data=bids_data_str)
-    try:
-        evaluated = pd.read_csv(io.StringIO(output))
-    except Exception:
-        st.error("Could not parse LLM output for bid evaluation. Using fallback.")
-        evaluated = bids_df.head(2)
-    return evaluated
+    output = chain.run(bids_csv_text = bids_csv_text, trd = trd)
+    output = output.strip()
+    shortlisted = pd.read_csv(io.StringIO(output))
+    return shortlisted
 
 def simulate_negotiation_and_contract(top_bid):
     """
@@ -275,7 +283,8 @@ if 'contract_draft' not in st.session_state:
 # -------------------------------
 # 4. Streamlit App Layout
 # -------------------------------
-
+st.set_page_config(page_title = "Transglobal Procurement Agent")
+st.title("Procurement Agent")
 
 # Step 1: Inputs
 st.header("Step 1: Upload Inputs & Business Requirements")
@@ -319,11 +328,11 @@ with st.form("input_form"):
 st.header("Step 2: Convert Business to Technical Requirements")
 if st.session_state['business_requirements']:
     if st.button("Convert to Technical Requirements"):
-        tech_req = convert_business_to_technical(st.session_state['business_requirements'])
-        st.session_state['technical_requirements'] = tech_req
+        trd = brd_to_trd(st.session_state['business_requirements'])
+        st.session_state['technical_requirements'] = trd
         st.success("Generated Technical Requirements")
         with st.expander("Show Technical Requirements"):
-            st.write(tech_req)
+            st.write(trd)
         # st.write("Generated Technical Requirements:")
         # st.text_area("Technical Requirements", value=tech_req, height=150)
 else:
@@ -333,7 +342,7 @@ else:
 st.header("Step 3: Generate RFP")
 if st.session_state['technical_requirements']:
     if st.button("Generate RFP"):
-        rfp = generate_rfp(st.session_state['technical_requirements'])
+        rfp = trd_to_rfp(st.session_state['technical_requirements'])
         st.session_state['rfp_document'] = rfp
         st.success("Generated RFP")
         with st.expander("Show RFP"):
@@ -391,26 +400,24 @@ else:
 # Step 6: Bid Evaluation
 st.header("Step 6: Evaluate Bids")
 # Replace the below if statement with "if tender document has been generated or not in the Step 4"
-if st.session_state['shortlisted_vendors'] is not None:
+if st.session_state['email']:
     bids_file = st.file_uploader("Upload Bids CSV", type=["csv"])
     if st.button("Evaluate Bids"):
-        evaluated = evaluate_bids(st.session_state['bids_df'])
-        st.session_state['evaluated_bids'] = evaluated
-        st.success("Evaluated Bids")
-        with st.expander("Show Top Evaluated Bids"):
-            st.dataframe(evaluated)
+        if bids_file is not None:
+            try:
+                bids_df = pd.read_csv(bids_file)
+                st.session_state['bids_df'] = bids_df
+                st.success("Bids CSV uploaded successfully.")
+                evaluated = evaluate_bids(st.session_state['bids_df'], st.session_state['technical_requirements'])
+                st.session_state['evaluated_bids'] = evaluated
+                st.success("Evaluated Bids")
+                with st.expander("Show Top Evaluated Bids"):
+                    st.dataframe(evaluated)
+            except Exception as e:
+                st.error(f"Error reading bids CSV: {e}")
     
-# if st.session_state['bids_df'] is not None:
-#     if st.button("Evaluate Bids"):
-#         evaluated = evaluate_bids(st.session_state['bids_df'])
-#         st.session_state['evaluated_bids'] = evaluated
-#         st.success("Evaluated Bids")
-#         with st.expander("Show Top Evaluated Bids"):
-#             st.dataframe(evaluated)
-        # st.write("Top Evaluated Bids:")
-        # st.dataframe(evaluated)
 else:
-    st.info("Please upload Bids CSV in Step 1.")
+    st.info("Ensure Email is generated")
 
 # Step 7: Negotiation & Contract
 st.header("Step 7: Negotiation Simulation and Contract Drafting")
@@ -449,6 +456,10 @@ if st.session_state['shortlisted_vendors'] is not None:
 if st.session_state['tender_doc']:
     with st.expander("Show Tender Document"):
         st.write(st.session_state['tender_doc'])
+
+if st.session_state['email']:
+    with st.expander("Show Email for shortlisted vendors"):
+        st.write(st.session_state['email'])
     
 if st.session_state['evaluated_bids'] is not None:
     with st.expander("Show Top Evaluated Bids"):
