@@ -6,7 +6,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
 
-st.set_page_config(page_title = "Transglobal Procurement Agent", icon = "📦")
+st.set_page_config(page_title = "Transglobal Procurement Agent", page_icon = "📦")
 st.title("Procurement Agent")
 
 # displaying versions of libraries used
