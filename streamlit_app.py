@@ -6,6 +6,9 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
 
+st.set_page_config(page_title = "Transglobal Procurement Agent", icon = "📦")
+st.title("Procurement Agent")
+
 # displaying versions of libraries used
 print("streamlit version:", st.__version__)
 print("langchain version:", langchain.__version__)
@@ -272,8 +275,7 @@ if 'contract_draft' not in st.session_state:
 # -------------------------------
 # 4. Streamlit App Layout
 # -------------------------------
-st.set_page_config(page_title = "Transglobal Procurement Agent", icon = "📦")
-st.title("Procurement Agent")
+
 
 # Step 1: Inputs
 st.header("Step 1: Upload Inputs & Business Requirements")
