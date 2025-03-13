@@ -35,10 +35,41 @@ llm = load_llm()
 # -------------------------------
 def convert_business_to_technical(business_text):
     """Use the LLM to convert business requirements into technical requirements."""
-    prompt_template = """Convert the following Business Requirements Document (BRD) into a detailed and structured Technical Requirements Document.
-                        The output should be based solely on the information provided in the BRD—do not introduce any external details or hallucinations.
-                        Include both functional and non-functional requirements for purchasing new servers, software, or any other technical assets.
-                        Ensure the document is clear and unambiguous so that suppliers can easily understand the specifications.
+    prompt_template = """You are a Senior Technical Procurement Specialist at a manufacturing firm. Your task is to convert the following Business Requirements Document (BRD) into a comprehensive, strictly technical requirements document. Use only the details provided in the BRD and do not add any external information. The output must include both functional and non-functional requirements for purchasing new servers, software, or other technical assets, and it should be written so that suppliers can unambiguously understand every specification.
+                        Your output must clearly address each of the following key factors and include specific examples or ranges where applicable:
+                        Requirement Clarity & Specification Accuracy
+                        Example: If the BRD specifies intensive software handling, include a statement like "System must include 16 GB DDR4 RAM or more" to support heavy multitasking.
+                        Example: For high computational performance, specify a processor such as "Intel Core i7 (11th Gen) or equivalent" or higher.
+                        Standardized Descriptions
+                        Example: Instead of vague terms like "fast processor," clearly state "Processor: Intel Core i7 (11th Gen) or better."
+                        Example: For storage, specify "512GB SSD or higher" if the BRD indicates high storage needs.
+                        Hidden Costs Consideration
+                        Example: Include notes like "Include considerations for logistics, customs, and storage costs" when the BRD mentions any potential hidden costs.
+                        Example: If delivery or installation is mentioned, ensure to note any additional expenses that might be incurred.
+                        Regulatory Compliance
+                        Example: If the BRD refers to adhering to industry standards, include "Ensure compliance with import/export laws and applicable industry standards."
+                        Example: Specify required certifications or licenses if mentioned (e.g., "Operating System must be a licensed version of Windows 11 Pro").
+                        Risk Mitigation
+                        Example: If the BRD highlights potential risks, output "Include contract clauses for warranties (e.g., 3 years onsite warranty), penalties for delays, and risk mitigation measures."
+                        Example: Mention hidden risks like "Consideration for potential downtime and its impact on operations."
+                        Additionally, use the following example vendor bid to guide the level of detail expected. This example is for reference only and should not be copied verbatim unless the BRD contains matching details:
+                        Processor: Intel Core i7 (11th Gen) or equivalent
+                        RAM: 16 GB DDR4 or more
+                        Storage: 512GB SSD or higher
+                        Display: 15.6-inch FHD (1920×1080) IPS
+                        Graphics: Integrated or discrete as specified
+                        Battery Life: 10 hours or more
+                        Ports: e.g., 2× USB 3.0, 1× USB Type-C, HDMI, 3.5mm audio jack, Ethernet
+                        Connectivity: Wi-Fi 6, Bluetooth 5.0
+                        Operating System: Windows 11 Pro (licensed)
+                        Keyboard: Backlit keyboard
+                        Weight: Approximately 2.2 kg
+                        Warranty: 3 years onsite warranty
+                        Software: Pre-installed Windows 11 Pro with license, Office 365 Business, Antivirus with a 3-year subscription
+                        Financial Proposal: e.g., Unit Price: $1,200 per unit; total cost for 100 units: $120,000; additional software/services: $5,000; Payment Terms: 50% advance, 50% on delivery
+                        Instruction:
+                        Convert the provided BRD into a detailed Technical Requirements Document that strictly contains technical details extracted from the BRD. 
+                        For each key technical aspect (e.g., processor, RAM, storage), if the BRD suggests intensive or high-performance needs, the output must specify exact or minimum values such as "16 GB DDR4" or "512GB SSD or more" as appropriate. Similarly, include specific requirements for connectivity, operating system, software, hidden cost considerations, regulatory compliance, and risk mitigation measures.
                         BRD: {business_text}"""
     
     prompt = PromptTemplate(input_variables=["business_text"], template=prompt_template)
