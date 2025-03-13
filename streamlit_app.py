@@ -494,7 +494,6 @@ st.sidebar.markdown(
 st.sidebar.markdown("### 📦 Library Versions")
 st.sidebar.markdown(f"🔹 **Streamlit**: {st.__version__}")
 st.sidebar.markdown(f"🔹 **LangChain**: {langchain.__version__}")
-st.sidebar.markdown(f"🔹 **google-generativeai**: {genai.__version__}")
 st.sidebar.markdown(f"🔹 **Pandas**: {pd.__version__}")
 
 # Sidebar section
