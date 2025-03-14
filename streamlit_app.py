@@ -227,17 +227,21 @@ def simulate_negotiation_and_contract(top_bid, bids_df):
     prompt_template = """You are a Procurement Negotiator.
                         First, you will check the names of the shortlisted bids in the file {top_bids}.
                         Store the name of the first bid as "TopBid" (this is only for your reference, do not mention "TopBid" in the response)
-                        To proceed further you will only consider the details of these shortlisted bids from the file {bids_details}.
+                        To proceed further you will only consider the details of these shortlisted bids from the file {bids_details}. now, follow the intructions below:
+
+                       [Negotiation Strategy]
                         1. Outline a robust negotiation strategy. Apart from other vital things, construct the negotiation strategy including the following factors also:
                             1. BATNA: Analyze the pricing of bids to determine the company's Best Alternative to a Negotiated Agreement (BATNA). Evaluate alternatives, given the shortlisted bids.
-                            2. Then, using LLM-driven insights, simulate negotiation scenarios to devise robust negotiation strategies for engaging with the preferred supplier.
+                            2. Simulate negotiation scenarios to devise robust negotiation strategies for engaging with the preferred supplier.
                             3. Market Trends, Supplier Pricing and Bulk Discounts: Your recommendations should ensure that the procuring company is well-prepared to secure favorable terms by leveraging competitive market trends, supplier pricing, and potential bulk discounts.
                             4. Benchmarking: Compare prices across vendors.
                             5. Using first principles thinking, break down the negotiation challenge into its fundamental components. Identify the core drivers—such as supplier cost structures, market trends, and value determinants—without relying on conventional assumptions.
                             6. Leverage Competition: Use the competitive environment to negotiate better terms.
-                        
-                        2. Assess the potential risks associated with "TopBid" and generate a risk assessment report.
 
+                        [Risk Assessment Report]
+                        2. Assess the potential risks associated with "TopBid" and generate a risk assessment report.
+                        
+                        [Draft Contract]
                         3. Then, draft a contract document only for "TopBid" (ensure to include findings from the risk assessment report). 
                             Contract document should include clauses for risk mitigation, performance guarantees, and dispute resolution, ensuring that both parties have clear and binding commitments.
                         
@@ -252,7 +256,7 @@ def simulate_negotiation_and_contract(top_bid, bids_df):
     prompt = PromptTemplate(input_variables=["top_bids", "bids_details"], template=prompt_template)
     chain = LLMChain(llm=llm, prompt=prompt)
     output = chain.run(top_bids = top_bids_str, bids_details = bids_csv_text)
-    st.write(output)
+    #st.write(output)
     # Split the output into parts using '---' as the delimiter.
     # If there are at least 3 parts, assign them to negotiation_strategy, risk_assessment, and contract_draft.
     # Otherwise, assign fallback messages for any missing parts.
