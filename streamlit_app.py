@@ -246,7 +246,8 @@ def simulate_negotiation_and_contract(top_bid, bids_df):
                         '---'
                         "Risk Assessment Report"
                         '---'
-                        "Draft Contract""""
+                        "Draft Contract"
+                        """
 
     prompt = PromptTemplate(input_variables=["top_bids", "bids_details"], template=prompt_template)
     chain = LLMChain(llm=llm, prompt=prompt)
