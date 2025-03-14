@@ -1,3 +1,5 @@
+# Objective: 
+
 import streamlit as st
 import langchain
 import pandas as pd
@@ -5,9 +7,6 @@ import io
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
-
-st.set_page_config(page_title = "Procurement Agent", page_icon = "📦",initial_sidebar_state="expanded")
-st.title("Transglobal Procurement Agent")
 
 # displaying versions of libraries used
 print("streamlit version:", st.__version__)
@@ -137,11 +136,7 @@ def match_vendors(vendor_df):
     output = chain.run(vendor_data=vendor_csv_str)
     # Clean up output to remove extra blank lines or unwanted text
     output = output.strip()
-    # try:
     shortlisted = pd.read_csv(io.StringIO(output))
-    # except Exception:
-    #     st.error("Could not parse LLM output for vendor selection. Using fallback selection.")
-    #     shortlisted = vendor_df.head(3)
     return shortlisted
 
 def generate_tender_doc(trd):
@@ -220,43 +215,60 @@ def evaluate_bids(bids_df, trd):
     shortlisted = pd.read_csv(io.StringIO(output))
     return shortlisted
 
-def simulate_negotiation_and_contract(top_bid):
+def simulate_negotiation_and_contract(top_bid, bids_df):
     """
     Use the LLM to simulate a negotiation strategy and generate a contract draft from the top bid.
     """
-    bid_details = "\n".join([f"{k}: {v}" for k, v in top_bid.items()])
-    prompt_template = """You are a Procurement Negotiator with top 2 bid details:\n{bid_details}\n\n
-
-                        First, outline a robust negotiation strategy. Then, draft a contract reflecting your strategy. Separate the negotiation strategy and the draft contract with '---'.
+    # Create a multi-line string of the top bid's details by formatting each key-value pair as "key: value" and joining them with newline characters.
+    top_bids_str = "\n".join([f"{k}: {v}" for k, v in top_bid.items()])
+    # Converts the DataFrame to a text
+    bids_csv_text = bids_df.to_string(index=False)  
+    
+    prompt_template = """You are a Procurement Negotiator.
+                        First, you will check the names of the shortlisted bids in the file {top_bids}.
+                        Store the name of the first bid as "TopBid" (this is only for your reference, do not mention "TopBid" in the response)
+                        To proceed further you will only consider the details of these shortlisted bids from the file {bids_details}.
+                        Now outline a robust negotiation strategy. Then assess the potential risks associated with "TopBid" and generate a risk assessment report.
+                        Then, draft a contract document only for "TopBid" (ensure to include findings from the risk assessment report).
+                        Separate the negotiation strategy, risk assessment report and the draft contract each with '---'.
+                        Apart from other vital things, construct the negotiation strategy including the following factors also:
+                            1. BATNA: Analyze the bids data to determine the company's Best Alternative to a Negotiated Agreement (BATNA). Evaluate alternatives, given the shortlisted bids.
+                            2. Then, using LLM-driven insights, simulate negotiation scenarios to devise robust negotiation strategies for engaging with the preferred supplier.
+                            3. Market Trends, Supplier Pricing and Bulk Discounts: Your recommendations should ensure that the procuring company is well-prepared to secure favorable terms by leveraging competitive market trends, supplier pricing, and potential bulk discounts.
+                            4. Benchmarking: Compare prices across vendors.
+                            5. Using first principles thinking, break down the negotiation challenge into its fundamental components. Identify the core drivers—such as supplier cost structures, market trends, and value determinants—without relying on conventional assumptions.
+                            6. Leverage Competition: Use the competitive environment to negotiate better terms.
+                        Contract document should include clauses for risk mitigation, performance guarantees, and dispute resolution, ensuring that both parties have clear and binding commitments.
                         
-                        Analyze the bids' data to determine the company's Best Alternative to a Negotiated Agreement (BATNA). Then, using LLM-driven insights, simulate negotiation scenarios to devise robust negotiation strategies for engaging with the preferred supplier. 
-                        Your recommendations should ensure that the procuring company is well-prepared to secure favorable terms by leveraging competitive market trends, supplier pricing, and potential bulk discounts.
+                        Output Format: only 3 sections - negotiation strategy, risk assessment report and the draft contract each separated by '---'"""
 
-                        Using first principles thinking, break down the negotiation challenge into its fundamental components. Identify the core drivers—such as supplier cost structures, market trends, and value determinants—without relying on conventional assumptions. 
-                        Reconstruct a negotiation strategy from these basic truths that challenges standard practices and leverages competitive insights.
-
-                        Apart from other vital things, include the key factors below also:
-                        BATNA: Evaluate alternatives, given the two bids.
-                        Market Trends & Supplier Pricing: Analyze current trends and pricing.
-                        Benchmarking: Compare prices across vendors.
-                        Bulk Discounts: Assess potential savings on volume purchases.
-                        Leverage Competition: Use the competitive environment to negotiate better terms."""
-
-    prompt = PromptTemplate(input_variables=["bid_details"], template=prompt_template)
+    prompt = PromptTemplate(input_variables=["top_bids", "bids_details"], template=prompt_template)
     chain = LLMChain(llm=llm, prompt=prompt)
-    output = chain.run(bid_details=bid_details)
+    output = chain.run(top_bids = top_bids_str, bids_details = bids_csv_text)
+    st.write(output)
+    # Split the output into parts using '---' as the delimiter.
+    # If there are at least 3 parts, assign them to negotiation_strategy, risk_assessment, and contract_draft.
+    # Otherwise, assign fallback messages for any missing parts.
     if "---" in output:
-        negotiation_strategy, contract_draft = output.split("---", 1)
+        parts = output.split("---")
+        if len(parts) >= 3:
+            negotiation_strategy = parts[0]
+            risk_assessment = parts[1]
+            contract_draft = parts[2]
+        else:
+            negotiation_strategy = parts[0] if len(parts) > 0 else output
+            risk_assessment = parts[1] if len(parts) > 1 else "No risk assessment found."
+            contract_draft = "No contract draft found."
     else:
-        negotiation_strategy = output
+        negotiation_strategy = output.strip()
+        risk_assessment = "No risk assessment found."
         contract_draft = "No contract draft found."
-    return negotiation_strategy.strip(), contract_draft.strip()
+
+    return negotiation_strategy.strip(), risk_assessment.strip(), contract_draft.strip()
 
 # -------------------------------
 # 3. Initialize Session State
 # -------------------------------
-# if 'disabled' not in st.session_state:
-#     st.session_state.disabled = False
 if 'business_requirements' not in st.session_state:
     st.session_state['business_requirements'] = ''
 if 'technical_requirements' not in st.session_state:
@@ -277,21 +289,21 @@ if 'evaluated_bids' not in st.session_state:
     st.session_state['evaluated_bids'] = None
 if 'negotiation_strategy' not in st.session_state:
     st.session_state['negotiation_strategy'] = ''
+if 'risk_assessment' not in st.session_state:
+    st.session_state['risk_assessment'] = ''
 if 'contract_draft' not in st.session_state:
     st.session_state['contract_draft'] = ''
 
 # -------------------------------
 # 4. Streamlit App Layout
 # -------------------------------
-#st.set_page_config(page_title = "Transglobal Procurement Agent") ----- Moved to top
-#st.title("Procurement Agent")
+st.set_page_config(page_title = "Procurement Agent", page_icon = "📦",initial_sidebar_state="expanded")
+st.title("Transglobal Procurement Agent")
 
 # Step 1: Inputs
 st.header("Step 1: Upload Inputs & Business Requirements")
 with st.form("input_form"):
     business_text = st.text_area("Enter Business Requirements", height=150)
-    # vendor_file = st.file_uploader("Upload Vendor History CSV", type=["csv"])
-    # bids_file = st.file_uploader("Upload Bids CSV", type=["csv"])
     submitted_inputs = st.form_submit_button("Submit Inputs")
 
     if submitted_inputs:
@@ -302,28 +314,6 @@ with st.form("input_form"):
         else:
             st.error("Please enter business requirements.")
         
-        # Process vendor CSV
-        # if vendor_file is not None:
-        #     try:
-        #         vendor_df = pd.read_csv(vendor_file)
-        #         st.session_state['vendor_df'] = vendor_df
-        #         st.success("Vendor CSV uploaded successfully.")
-        #     except Exception as e:
-        #         st.error(f"Error reading vendor CSV: {e}")
-        # else:
-        #     st.error("Please upload Vendor History CSV.")
-        
-        # # Process bids CSV
-        # if bids_file is not None:
-        #     try:
-        #         bids_df = pd.read_csv(bids_file)
-        #         st.session_state['bids_df'] = bids_df
-        #         st.success("Bids CSV uploaded successfully.")
-        #     except Exception as e:
-        #         st.error(f"Error reading Bids CSV: {e}")
-        # else:
-        #     st.error("Please upload Bids CSV.")
-
 # Step 2: Convert to Technical Requirements
 st.header("Step 2: Convert Business to Technical Requirements")
 if st.session_state['business_requirements']:
@@ -333,8 +323,6 @@ if st.session_state['business_requirements']:
         st.success("Generated Technical Requirements")
         with st.expander("Show Technical Requirements"):
             st.write(trd)
-        # st.write("Generated Technical Requirements:")
-        # st.text_area("Technical Requirements", value=tech_req, height=150)
 else:
     st.info("Enter business requirements in Step 1.")
 
@@ -347,7 +335,6 @@ if st.session_state['technical_requirements']:
         st.success("Generated RFP")
         with st.expander("Show RFP"):
             st.write(rfp)
-        # st.text_area("RFP Document", value=rfp, height=150)
 else:
     st.info("Please generate technical requirements in Step 2.")
 
@@ -399,7 +386,6 @@ else:
 
 # Step 6: Bid Evaluation
 st.header("Step 6: Evaluate Bids")
-# Replace the below if statement with "if tender document has been generated or not in the Step 4"
 if st.session_state['email']:
     bids_file = st.file_uploader("Upload Bids CSV", type=["csv"])
     if st.button("Evaluate Bids"):
@@ -424,20 +410,19 @@ st.header("Step 7: Negotiation Simulation and Contract Drafting")
 if st.session_state['evaluated_bids'] is not None and not st.session_state['evaluated_bids'].empty:
     top_bid = st.session_state['evaluated_bids'].iloc[0].to_dict()
     if st.button("Simulate Negotiation & Draft Contract"):
-        negotiation_strategy, contract_draft = simulate_negotiation_and_contract(top_bid)
+        negotiation_strategy, risk_assessment, contract_draft = simulate_negotiation_and_contract(top_bid, st.session_state['bids_df'])
         st.session_state['negotiation_strategy'] = negotiation_strategy
+        st.session_state['risk_assessment'] = risk_assessment
         st.session_state['contract_draft'] = contract_draft
-        st.success("Generated Negotiation Strategy and Contract Draft")
+        st.success("Generated Negotiation Strategy, Risk Assessment Report and Contract Draft")
         with st.expander("Show Negotiation Strategy"):
             st.write(negotiation_strategy)
-        # st.write("Negotiation Strategy:")
-        # st.text_area("Negotiation Strategy", value=negotiation_strategy, height=100)
+        with st.expander("Show Risk Assessment Report"):
+            st.write(risk_assessment)
         with st.expander("Show Contract Draft"):
             st.write(contract_draft)
-        # st.write("Contract Draft:")
-        # st.text_area("Contract Draft", value=contract_draft, height=150)
 else:
-    st.info("Please evaluate bids in Step 5.")
+    st.info("Please evaluate bids in Step 6.")
 
 # Step 8: Final Review & Downloads
 st.header("Step 8: Final Review & Download")
@@ -469,15 +454,21 @@ if st.session_state['negotiation_strategy']:
     with st.expander("Show Negotiation Strategy"):
         st.write(st.session_state['negotiation_strategy'])
 
+if st.session_state['risk_assessment']:
+    with st.expander("Show Risk Assessment Report"):
+        st.write(st.session_state['risk_assessment'])
+
 if st.session_state['contract_draft']:
     with st.expander("Show Contract Draft"):
         st.write(st.session_state['contract_draft'])
 
 st.header("Download Final Documents")
 if st.session_state['rfp_document']:
-    st.download_button("Download RFP Document", st.session_state['rfp_document'], file_name="RFP_Document.txt")
+    st.download_button("Download RFP Document", st.session_state['rfp_document'], file_name="Request_For_Proposal.txt")
 if st.session_state['technical_requirements']:
     st.download_button("Download Technical Requirements", st.session_state['technical_requirements'], file_name="Technical_Requirements.txt")
+if st.session_state['risk_assessment']:
+    st.download_button("Download Risk Assessment Report", st.session_state['risk_assessment'], file_name="Risk_assessment_report.txt")
 if st.session_state['contract_draft']:
     st.download_button("Download Contract Draft", st.session_state['contract_draft'], file_name="Contract_Draft.txt")
 
