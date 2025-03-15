@@ -1,6 +1,7 @@
 # Objective: To build an Agentic AI that automates TransGlobal Industries' procurement process by leveraging LLMs, LangChain, and Streamlit. 
 
 import streamlit as st
+import os
 import langchain
 import pandas as pd
 import io
@@ -27,7 +28,7 @@ def load_llm():
         model="gemini-1.5-pro-latest",  # or another available model (e.g. "chat-bison@001")
         temperature=0,
         max_tokens=8000,
-        api_key=st.secrets["GOOGLE_API_KEY"]
+        api_key=os.environ.get("GOOGLE_API_KEY")
     )
 
 llm = load_llm()
@@ -220,14 +221,13 @@ def simulate_negotiation_and_contract(top_bid, bids_df):
     Use the LLM to simulate a negotiation strategy and generate a contract draft from the top bid.
     """
     # Create a multi-line string of the top bid's details by formatting each key-value pair as "key: value" and joining them with newline characters.
-    # top_bids_str = "\n".join([f"{k}: {v}" for k, v in top_bid.items()])
-    top_bids_text = top_bid.to_string(index=False)
+    top_bids_str = "\n".join([f"{k}: {v}" for k, v in top_bid.items()])
     # Converts the DataFrame to a text
     bids_csv_text = bids_df.to_string(index=False)  
     
     prompt_template_negotiation = """You are a Procurement Negotiator.
                         First, you will check the names of the shortlisted bids in the file {top_bids}.
-                        Store the name of the first bid as "TopBid" (this is only for your reference, do not mention "TopBid" in the response)
+                        Store the name of the first bid from the shortlisted bids as "TopBid" (this is only for your reference, do not mention "TopBid" in the response)
                         To proceed further you will only consider the details of these shortlisted bids from the file {bids_details}. now, follow the intructions below:
                         Outline a robust negotiation strategy. Apart from other vital things, construct the negotiation strategy including the following factors also:
                             1. BATNA: Analyze the pricing of bids to determine the company's Best Alternative to a Negotiated Agreement (BATNA). Evaluate alternatives, given the shortlisted bids.
