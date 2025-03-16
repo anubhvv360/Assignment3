@@ -531,6 +531,7 @@ st.sidebar.markdown(
 )
 
 # 📌 Display library versions
+st.sidebar.markdown("---")
 st.sidebar.markdown("### 📦 Library Versions")
 st.sidebar.markdown(f"🔹 **Streamlit**: {st.__version__}")
 st.sidebar.markdown(f"🔹 **LangChain**: {langchain.__version__}")
@@ -552,7 +553,6 @@ st.sidebar.markdown(
 # Sidebar section
 st.sidebar.markdown("---")
 st.sidebar.title("🙌 Credits")
-st.sidebar.markdown("**Created by Group 2**")
 
 # Create a DataFrame for the table
 groupdata = {
@@ -568,5 +568,5 @@ groupdata = {
 
 groupdf = pd.DataFrame(groupdata)
 # Display the table in the sidebar
-st.sidebar.markdown("### 👥 Team Members")
+st.sidebar.markdown("### 👥 Team Members - Group 2")
 st.sidebar.dataframe(groupdf, hide_index=True)
