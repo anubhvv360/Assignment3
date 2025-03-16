@@ -538,17 +538,34 @@ st.sidebar.markdown(f"🔹 **LangChain**: {langchain.__version__}")
 st.sidebar.markdown(f"🔹 **Pandas**: {pd.__version__}")
 
 # For user to download input files
+import requests
+
+# Sidebar title
 st.sidebar.markdown("---")
 st.sidebar.title("📥 Download Input Files")
 
-st.sidebar.markdown(
-    """
-    📜 [Download BRD](https://github.com/anubhvv360/Assignment3/raw/main/Data/Input%20File_Business%20Requirement.txt)  
-    📂 [Download Vendor History](https://github.com/anubhvv360/Assignment3/raw/main/Data/vendor_history.csv)  
-    📑 [Download Bids](https://github.com/anubhvv360/Assignment3/raw/main/Data/Bids.csv)  
-    """,
-    unsafe_allow_html=True
-)
+# Function to download file from GitHub and serve in Streamlit
+def download_file_from_github(url, filename):
+    response = requests.get(url)
+    if response.status_code == 200:
+        st.sidebar.download_button(
+            label=f"📥 Download {filename}",
+            data=response.content,
+            file_name=filename
+        )
+    else:
+        st.sidebar.error(f"❌ Failed to download {filename}")
+
+# GitHub raw URLs for files (Updated URLs to use 'raw.githubusercontent.com')
+files = {
+    "Business Requirement.txt": "https://raw.githubusercontent.com/anubhvv360/Assignment3/main/Data/Input%20File_Business%20Requirement.txt",
+    "Vendor History.csv": "https://raw.githubusercontent.com/anubhvv360/Assignment3/main/Data/vendor_history.csv",
+    "Bids.csv": "https://raw.githubusercontent.com/anubhvv360/Assignment3/main/Data/Bids.csv"
+}
+
+# Loop through files and create download buttons
+for filename, url in files.items():
+    download_file_from_github(url, filename)
 
 # Sidebar section
 st.sidebar.markdown("---")
