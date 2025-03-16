@@ -516,7 +516,7 @@ st.header("Step 7: Negotiation & Contract")
 
 # Ensure that evaluated bids exist and are not empty
 if st.session_state.get('evaluated_bids') is not None and not st.session_state['evaluated_bids'].empty:
-    top_bid = st.session_state['evaluated_bids'].iloc[0].to_dict()
+    top_bid = st.session_state['evaluated_bids']
     
     # Button for Negotiation Strategy
     if st.button("Get Negotiation Strategy"):
