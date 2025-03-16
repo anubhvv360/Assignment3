@@ -536,6 +536,11 @@ st.sidebar.markdown(f"🔹 **Streamlit**: {st.__version__}")
 st.sidebar.markdown(f"🔹 **LangChain**: {langchain.__version__}")
 st.sidebar.markdown(f"🔹 **Pandas**: {pd.__version__}")
 
+st.sidebar.markdown(
+    '[📥 Download Sample Input Files](https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_REPO/main/sample.txt)'
+)
+
+
 # Sidebar section
 st.sidebar.markdown("---")
 st.sidebar.markdown("**Created by Group 2**")
