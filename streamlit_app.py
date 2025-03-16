@@ -8,6 +8,7 @@ import io
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
+import requests
 
 # displaying versions of libraries used
 print("streamlit version:", st.__version__)
@@ -538,7 +539,7 @@ st.sidebar.markdown(f"🔹 **LangChain**: {langchain.__version__}")
 st.sidebar.markdown(f"🔹 **Pandas**: {pd.__version__}")
 
 # For user to download input files
-import requests
+
 
 # Sidebar title
 st.sidebar.markdown("---")
@@ -549,7 +550,7 @@ def download_file_from_github(url, filename):
     response = requests.get(url)
     if response.status_code == 200:
         st.sidebar.download_button(
-            label=f"📥 Download {filename}",
+            label=f"Download {filename}",
             data=response.content,
             file_name=filename
         )
