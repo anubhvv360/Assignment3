@@ -10,6 +10,8 @@ This is an advanced procurement automation tool designed for TransGlobal Industr
 ## Features
 - **Requirement Transformation:**  
   Converts high-level business requirements into detailed, unambiguous technical specifications.
+- **Input Files:**
+  Users can download the input files available in the sidebar for testing.
 - **RFP Generation:**  
   Produces professional Request for Proposal documents with clear performance criteria.
 - **Vendor Selection:**  
