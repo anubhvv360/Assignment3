@@ -586,5 +586,5 @@ groupdata = {
 
 groupdf = pd.DataFrame(groupdata)
 # Display the table in the sidebar
-st.sidebar.markdown("### 👥 Team Members - Group 2")
+st.sidebar.markdown("### 👥 Group 2")
 st.sidebar.dataframe(groupdf, hide_index=True)
