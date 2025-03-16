@@ -336,13 +336,13 @@ if st.session_state.get('evaluated_bids') is not None and not st.session_state['
 else:
     st.info("Please evaluate bids in Step 6 to proceed with negotiation and contract drafting.")
 
-################################################################################################################
+
 # def simulate_negotiation_and_contract(top_bid, bids_df):
 #     """
 #     Use the LLM to simulate a negotiation strategy and generate a contract draft from the top bid.
 #     """
 #     # Create a multi-line string of the top bid's details by formatting each key-value pair as "key: value" and joining them with newline characters.
-#     top_bids_str = "\n".join([f"{k}: {v}" for k, v in top_bid.items()])
+#     top_bids_text = "\n".join([f"{k}: {v}" for k, v in top_bid.items()])
 #     # Converts the DataFrame to a text
 #     bids_csv_text = bids_df.to_string(index=False)  
     
@@ -361,7 +361,7 @@ else:
 #                         """
 #     prompt_negotiation = PromptTemplate(input_variables=["top_bids", "bids_details"], template=prompt_template_negotiation)
 #     chain_negotiate = LLMChain(llm=llm, prompt=prompt_negotiation)
-#     output_negotiate = chain_negotiate.run(top_bids = top_bids_str, bids_details = bids_csv_text)
+#     output_negotiate = chain_negotiate.run(top_bids = top_bids_text, bids_details = bids_csv_text)
 
     
 #     prompt_template_risk = """You are a risk manager, expert in identifying potential risks associated with supplier relationships during procurement activities.
@@ -376,7 +376,7 @@ else:
 #                             """
 #     prompt_risk = PromptTemplate(input_variables=["top_bids", "bids_details"], template = prompt_template_risk)
 #     chain_risk = LLMChain(llm = llm, prompt = prompt_risk)
-#     output_risk = chain_risk.run(top_bids = top_bids_str, bids_details = bids_csv_text)
+#     output_risk = chain_risk.run(top_bids = top_bids_text, bids_details = bids_csv_text)
 
     
 #     prompt_template_contract = """You are an experienced Procurement Manager specializing in contract creation, with deep expertise in the legal aspects of procurement agreements. 
@@ -399,7 +399,7 @@ else:
 #                                 """
 #     prompt_contract = PromptTemplate(input_variables=["top_bids", "bids_details", "risk_report"], template = prompt_template_contract)
 #     chain_contract = LLMChain(llm = llm, prompt = prompt_contract)
-#     output_contract = chain_contract.run(top_bids = top_bids_str, bids_details = bids_csv_text, risk_report = output_risk) 
+#     output_contract = chain_contract.run(top_bids = top_bids_text, bids_details = bids_csv_text, risk_report = output_risk) 
     
 #     # Split the output into parts using '---' as the delimiter.
 #     # If there are at least 3 parts, assign them to negotiation_strategy, risk_assessment, and contract_draft.
