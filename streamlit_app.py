@@ -536,10 +536,17 @@ st.sidebar.markdown(f"🔹 **Streamlit**: {st.__version__}")
 st.sidebar.markdown(f"🔹 **LangChain**: {langchain.__version__}")
 st.sidebar.markdown(f"🔹 **Pandas**: {pd.__version__}")
 
-st.sidebar.markdown(
-    '[📥 Download Sample Input Files](https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_REPO/main/sample.txt)'
-)
+# For user to download input files
+st.sidebar.title("📥 Download Input Files")
 
+st.sidebar.markdown(
+    """
+    📜 [Download BRD](https://github.com/anubhvv360/Assignment3/raw/main/Data/Input%20File_Business%20Requirement.txt)  
+    📂 [Download Vendor History](https://github.com/anubhvv360/Assignment3/raw/main/Data/vendor_history.csv)  
+    📑 [Download Bids](https://github.com/anubhvv360/Assignment3/raw/main/Data/Bids.csv)  
+    """,
+    unsafe_allow_html=True
+)
 
 # Sidebar section
 st.sidebar.markdown("---")
