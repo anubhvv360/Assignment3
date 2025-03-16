@@ -5,7 +5,7 @@ A GenAI-powered procurement automation tool that transforms business requirement
 [![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://procurementagent.streamlit.app/)
 
 ## Overview
-Agentic AI is an advanced procurement automation tool designed for TransGlobal Industries. Leveraging cutting-edge GenAI technologies—including Large Language Models (LLMs), LangChain, and Streamlit—this app automates critical procurement stages such as converting business requirements into technical specifications, generating RFPs, selecting vendors, evaluating bids, and simulating negotiation strategies. By reducing manual intervention and improving accuracy, Agentic AI accelerates decision-making and enhances strategic agility.
+This is an advanced procurement automation tool designed for TransGlobal Industries. Leveraging cutting-edge GenAI technologies—including Large Language Models (LLMs), LangChain, and Streamlit—this app automates critical procurement stages such as converting business requirements into technical specifications, generating RFPs, selecting vendors, evaluating bids, and simulating negotiation strategies. By reducing manual intervention and improving accuracy, Agentic AI accelerates decision-making and enhances strategic agility.
 
 ## Features
 - **Requirement Transformation:**  
