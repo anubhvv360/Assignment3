@@ -537,6 +537,7 @@ st.sidebar.markdown(f"🔹 **LangChain**: {langchain.__version__}")
 st.sidebar.markdown(f"🔹 **Pandas**: {pd.__version__}")
 
 # For user to download input files
+st.sidebar.markdown("---")
 st.sidebar.title("📥 Download Input Files")
 
 st.sidebar.markdown(
@@ -550,6 +551,7 @@ st.sidebar.markdown(
 
 # Sidebar section
 st.sidebar.markdown("---")
+st.sidebar.title("🙌 Credits")
 st.sidebar.markdown("**Created by Group 2**")
 
 # Create a DataFrame for the table
