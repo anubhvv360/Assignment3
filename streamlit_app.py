@@ -216,10 +216,6 @@ def evaluate_bids(bids_df, trd):
     shortlisted = pd.read_csv(io.StringIO(output))
     return shortlisted
 
-# -------------------------------
-# 7. Negotiation, Risk Assessment & Contract Drafting (Individual Buttons)
-# -------------------------------
-
 def get_negotiation_strategy(top_bid, bids_df):
     """
     Use the LLM to simulate a negotiation strategy from the top bid.
@@ -293,78 +289,6 @@ Ensure the contract is professional, aligns with industry best practices, and mi
     chain_contract = LLMChain(llm=llm, prompt=prompt_contract)
     output_contract = chain_contract.run(top_bids=top_bids_text, bids_details=bids_csv_text, risk_report=risk_report)
     return output_contract
-##########################################################################################################
-
-##########################################################################################################
-# def simulate_negotiation_and_contract(top_bid, bids_df):
-#     """
-#     Use the LLM to simulate a negotiation strategy and generate a contract draft from the top bid.
-#     """
-#     # Create a multi-line string of the top bid's details by formatting each key-value pair as "key: value" and joining them with newline characters.
-#     top_bids_str = "\n".join([f"{k}: {v}" for k, v in top_bid.items()])
-#     # Converts the DataFrame to a text
-#     bids_csv_text = bids_df.to_string(index=False)  
-    
-#     prompt_template_negotiation = """You are a Procurement Negotiator.
-#                         First, you will check the names of the shortlisted bids in the file {top_bids}.
-#                         Store the name of the first bid from the shortlisted bids as "TopBid" (this is only for your reference, do not mention "TopBid" in the response)
-#                         To proceed further you will only consider the details of these shortlisted bids from the file {bids_details}. now, follow the intructions below:
-#                         Outline a robust negotiation strategy. Apart from other vital things, construct the negotiation strategy including the following factors also:
-#                             1. BATNA: Analyze the pricing of bids to determine the company's Best Alternative to a Negotiated Agreement (BATNA). Evaluate alternatives, given the shortlisted bids.
-#                             2. Simulate negotiation scenarios to devise robust negotiation strategies for engaging with the preferred supplier.
-#                             3. Market Trends, Supplier Pricing and Bulk Discounts: Your recommendations should ensure that the procuring company is well-prepared to secure favorable terms by leveraging competitive market trends, supplier pricing, and potential bulk discounts.
-#                             4. Benchmarking: Compare prices across vendors.
-#                             5. Using first principles thinking, break down the negotiation challenge into its fundamental components. Identify the core drivers—such as supplier cost structures, market trends, and value determinants—without relying on conventional assumptions.
-#                             6. Leverage Competition: Use the competitive environment to negotiate better terms.
-#                         Limit your response to no more than 400 words
-#                         """
-#     prompt_negotiation = PromptTemplate(input_variables=["top_bids", "bids_details"], template=prompt_template_negotiation)
-#     chain_negotiate = LLMChain(llm=llm, prompt=prompt_negotiation)
-#     output_negotiate = chain_negotiate.run(top_bids = top_bids_str, bids_details = bids_csv_text)
-
-    
-#     prompt_template_risk = """You are a risk manager, expert in identifying potential risks associated with supplier relationships during procurement activities.
-#                             First, you will check the names of the shortlisted bids in the file {top_bids}.
-#                             Store the name of the first bid from the shortlisted bids as "TopBid" (this is only for your reference, do not mention "TopBid" in the response)
-#                             To proceed further you will only consider the details of these shortlisted bids from the file {bids_details}. Now, follow the intructions below:
-#                             Carefully analyze the functional and non-functional characteristics of the "TopBid", including its technical specifications (e.g., processor, RAM, storage, performance benchmarks), operational features, and quality parameters.
-#                             Assess potential risks such as supplier reliability and financial stability, compliance with regulatory and industry standards, and adherence to warranty and service level agreements.
-#                             Additionally, evaluate hidden costs (logistics, maintenance, support), potential contract vulnerabilities, delivery timelines, market conditions, and any discrepancies in vendor performance history.
-#                             Generate a detailed risk assessment report that highlights critical risk factors, their potential impact, and recommended mitigation strategies.
-#                             Limit your response to no more than 450 words
-#                             """
-#     prompt_risk = PromptTemplate(input_variables=["top_bids", "bids_details"], template = prompt_template_risk)
-#     chain_risk = LLMChain(llm = llm, prompt = prompt_risk)
-#     output_risk = chain_risk.run(top_bids = top_bids_str, bids_details = bids_csv_text)
-
-    
-#     prompt_template_contract = """You are an experienced Procurement Manager specializing in contract creation, with deep expertise in the legal aspects of procurement agreements. 
-#                                 First, you will check the names of the shortlisted bids in the file {top_bids}.
-#                                 Store the name of the first bid from the shortlisted bids as "TopBid" (this is only for your reference, do not mention "TopBid" in the response)
-#                                 To proceed further you will only consider the details of these shortlisted bids from the file {bids_details}. Now, follow the intructions below:
-#                                 Your task is to draft a comprehensive contract document exclusively for 'TopBid,' incorporating key findings from the risk assessment report {risk_report}.
-#                                 The contract should be legally sound, ensuring clear and enforceable commitments between both parties. 
-#                                 It must include robust clauses for risk mitigation, performance guarantees, and dispute resolution to safeguard the interests of all stakeholders.
-
-#                                 Key Components to Include:
-#                                 1. Scope of Work (SOW): Clearly define the goods/services being procured.
-#                                 2. Pricing & Payment Terms: Specify total cost, discounts, payment schedules, and penalties for late payments.
-#                                 3. Service Level Agreements (SLAs): Establish performance expectations, response times, and penalties for non-compliance.
-#                                 4. Warranties & Support: Outline warranty periods, service coverage, and response times for support.
-#                                 5. Compliance & Legal Risks: Ensure adherence to data security, regulatory requirements, and intellectual property protections.
-#                                 6. Termination & Liability: Define exit clauses, liabilities, indemnities, and dispute resolution mechanisms.
-                                
-#                                 Ensure that the contract maintains a professional tone, aligns with industry best practices, and mitigates potential risks identified in the assessment report.
-#                                 """
-#     prompt_contract = PromptTemplate(input_variables=["top_bids", "bids_details", "risk_report"], template = prompt_template_contract)
-#     chain_contract = LLMChain(llm = llm, prompt = prompt_contract)
-#     output_contract = chain_contract.run(top_bids = top_bids_str, bids_details = bids_csv_text, risk_report = output_risk) 
-    
-#     # Split the output into parts using '---' as the delimiter.
-#     # If there are at least 3 parts, assign them to negotiation_strategy, risk_assessment, and contract_draft.
-#     # Otherwise, assign fallback messages for any missing parts.
-
-#     return output_negotiate, output_risk, output_contract
 
 # -------------------------------
 # 3. Initialize Session State
@@ -511,7 +435,6 @@ else:
     st.info("Ensure Email for vendors is generated")
 
 # Step 7: Negotiation & Contract
-##############
 st.header("Step 7: Negotiation & Contract")
 
 # Ensure that evaluated bids exist and are not empty
@@ -549,7 +472,6 @@ if st.session_state.get('evaluated_bids') is not None and not st.session_state['
                     st.write(contract_draft)
 else:
     st.info("Please evaluate bids in Step 6 to proceed with negotiation and contract drafting.")
-    ##############################
 
 # Step 8: Final Review & Downloads
 st.header("Step 8: Final Review & Download")
