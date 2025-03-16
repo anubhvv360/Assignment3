@@ -528,25 +528,25 @@ if st.session_state.get('evaluated_bids') is not None and not st.session_state['
             st.write(negotiation_strategy)
     
     # Button for Risk Assessment
-    if st.button("Get Risk Management Strategy"):
-        with st.spinner("Generating Risk Assessment Report..."):
-            risk_assessment = get_risk_assessment(top_bid, st.session_state['bids_df'])
-        st.session_state['risk_assessment'] = risk_assessment
-        st.success("Risk Assessment Report generated.")
-        with st.expander("Show Risk Assessment Report"):
-            st.write(risk_assessment)
+    if st.session_state['negotiation_strategy']:
+        if st.button("Get Risk Management Strategy"):
+            with st.spinner("Generating Risk Assessment Report..."):
+                risk_assessment = get_risk_assessment(top_bid, st.session_state['bids_df'])
+            st.session_state['risk_assessment'] = risk_assessment
+            st.success("Risk Assessment Report generated.")
+            with st.expander("Show Risk Assessment Report"):
+                st.write(risk_assessment)
     
     # Button for Contract Draft - requires risk assessment output to be available
-    if st.button("Get Draft Contract"):
-        if st.session_state.get('risk_assessment'):
-            with st.spinner("Generating Contract Draft..."):
-                contract_draft = get_contract_draft(top_bid, st.session_state['bids_df'], st.session_state['risk_assessment'])
-            st.session_state['contract_draft'] = contract_draft
-            st.success("Contract Draft generated.")
-            with st.expander("Show Contract Draft"):
-                st.write(contract_draft)
-        else:
-            st.error("Please generate the Risk Assessment Report first.")
+    if st.session_state['negotiation_strategy'] and st.session_state['risk_assessment']:
+        if st.button("Get Draft Contract"):
+            if st.session_state.get('risk_assessment'):
+                with st.spinner("Generating Contract Draft..."):
+                    contract_draft = get_contract_draft(top_bid, st.session_state['bids_df'], st.session_state['risk_assessment'])
+                st.session_state['contract_draft'] = contract_draft
+                st.success("Contract Draft generated.")
+                with st.expander("Show Contract Draft"):
+                    st.write(contract_draft)
 else:
     st.info("Please evaluate bids in Step 6 to proceed with negotiation and contract drafting.")
     ##############################
