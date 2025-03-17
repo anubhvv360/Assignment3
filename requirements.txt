@@ -4,3 +4,4 @@ langchain
 google-generativeai
 langchain-google-genai
 requests
+PyPDF2
