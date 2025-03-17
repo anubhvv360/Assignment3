@@ -567,7 +567,7 @@ def download_file_from_github(url, filename):
     response = requests.get(url)
     if response.status_code == 200:
         st.sidebar.download_button(
-            label=f"Download {filename}",
+            label=f"{filename}",
             data=response.content,
             file_name=filename
         )
