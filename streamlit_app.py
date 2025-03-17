@@ -9,6 +9,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
 import requests
+import PyPDF2  # For extracting text from PDF files
 
 # displaying versions of libraries used
 print("streamlit version:", st.__version__)
@@ -328,12 +329,28 @@ st.title("Transglobal Procurement Agent")
 # Step 1: Inputs
 st.header("Step 1: Enter Business Requirements")
 with st.form("input_form"):
+    business_upload = st.file_uploader("Choose a TXT or PDF file", type=["txt", "pdf"])
     business_text = st.text_area("Text area to enter business requirements", height=150)
+
+    if business_upload is not None:
+        file_ext = business_upload.name.split('.')[-1].lower()
+        if file_ext == "txt":
+            input_text = business_upload.read().decode("utf-8")
+        elif file_ext == "pdf":
+            pdf_reader = PyPDF2.PdfReader(business_upload)
+            input_text = ""
+            for page in pdf_reader.pages:
+                page_text = page.extract_text()
+                if page_text:
+                    input_text += page_text + "\n"
+    else:
+        input_text = business_text if business_text else None
+    
     submitted_inputs = st.form_submit_button("Submit BRD")
 
     if submitted_inputs:
-        if business_text:
-            st.session_state['business_requirements'] = business_text
+        if input_text:
+            st.session_state['business_requirements'] = input_text
             st.success("Business requirements captured.")            
         else:
             st.error("Please enter business requirements.")
