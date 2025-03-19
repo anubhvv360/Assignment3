@@ -11,6 +11,9 @@ from langchain.prompts import PromptTemplate
 import requests
 import PyPDF2  # For extracting text from PDF files
 
+st.set_page_config(page_title = "Procurement Agent", page_icon = "📦",initial_sidebar_state="expanded")
+st.title("TransGlobal Procurement Agent")
+
 # displaying versions of libraries used
 print("streamlit version:", st.__version__)
 print("langchain version:", langchain.__version__)
@@ -323,8 +326,8 @@ if 'contract_draft' not in st.session_state:
 # -------------------------------
 # 4. Streamlit App Layout
 # -------------------------------
-st.set_page_config(page_title = "Procurement Agent", page_icon = "📦",initial_sidebar_state="expanded")
-st.title("TransGlobal Procurement Agent")
+# st.set_page_config(page_title = "Procurement Agent", page_icon = "📦",initial_sidebar_state="expanded")
+# st.title("TransGlobal Procurement Agent")
 
 # Step 1: Inputs
 st.header("Step 1: Enter Business Requirements")
