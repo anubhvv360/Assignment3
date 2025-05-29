@@ -3,3 +3,6 @@ langchain>=0.0.300
 chromadb>=0.3.24
 google-generative-ai>=0.5.0
 pypdf>=3.9.0
+
+# (Optional but recommended)
+python-dotenv>=1.0.0     # load your GEMINI_API_KEY from a .env file
