@@ -1,7 +1,5 @@
-streamlit
-pandas
-langchain
-google-generativeai
-langchain-google-genai
-requests
-PyPDF2
+streamlit>=1.18.0
+langchain>=0.0.300
+chromadb>=0.3.24
+google-generative-ai>=0.5.0
+pypdf>=3.9.0
